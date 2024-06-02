@@ -278,7 +278,7 @@ const Home = ({ marketplace, account }) => {
                     <div className="p-2">
                       <h5 className="text-xl font-semibold text-blue-600 dark:text-blue-400">{item.name}</h5>
                       <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                        <strong>{ethers.utils.formatUnits(item.totalPrice, "ether")} ETH</strong><br></br>
+                        <strong>{ethers.utils.formatUnits(item.totalPrice, "ether")} BIT</strong><br></br>
                         <strong>Total Minted : {item.num}</strong><br />
                         <strong>Remaining : {item.remaining}</strong>
                       </p>
