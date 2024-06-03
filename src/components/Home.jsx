@@ -123,7 +123,7 @@
 import { useState, useEffect } from 'react';
 import { ethers } from "ethers";
 import Info from './Info';
-import { toast } from 'react-toastify'
+import { toast } from 'react-toastify';
 
 const Home = ({ marketplace, account }) => {
   useEffect(() => {
@@ -134,6 +134,7 @@ const Home = ({ marketplace, account }) => {
   const [items, setItems] = useState([]);
   const [toggle, setToggle] = useState(false); // State for toggling Info component
   const [nftitem, setNftitem] = useState(null); // State to store NFT item
+  const [selectedNumbers, setSelectedNumbers] = useState({});
 
   const loadMarketplaceItems = async () => {
     console.log("Inside loadMarketplace");
@@ -144,7 +145,7 @@ const Home = ({ marketplace, account }) => {
       const item = await marketplace.items(i);
       console.log("Inside For first item", item);
       if (!item.sold) {
-        console.log("Calling toenURI");
+        console.log("Calling tokenURI");
         const uri = await marketplace.tokenURI(item.tokenId);
         const response = await fetch(uri);
         const metadata = await response.json();
@@ -158,7 +159,6 @@ const Home = ({ marketplace, account }) => {
           name: metadata.name,
           description: metadata.description,
           image: metadata.image,
-          // video: metadata.video,
           num: metadata.num,
           remaining: tracknum,
         });
@@ -167,40 +167,157 @@ const Home = ({ marketplace, account }) => {
     setLoading(false);
     setItems(items);
   };
+
   const Changestate = async () => {
     setToggle(!toggle);
-  }
+  };
+
   const viewMarketItem = async (item) => {
     const response = await marketplace.seeNFT(item.itemId);
-    const uri = await response.wait(); // Wait for the transaction to complete
+    await response.wait(); // Wait for the transaction to complete
 
     const links = await marketplace.tokenURI(item.itemId);
     console.log("Links", links);
     const responses = await fetch(links);
-    // console.log("Result",result);
     const result = await responses.json();
     console.log("Result", result);
     setToggle(true); // Set toggle to true to show Info component
-    // loadMarketplaceItems();
     setNftitem(result);
   };
 
-  const [num, setNum] = useState('');
+  const handleChange = (idx, event) => {
+    const { value } = event.target;
+    setSelectedNumbers((prevSelectedNumbers) => ({
+      ...prevSelectedNumbers,
+      [idx]: value,
+    }));
+  };
 
-  const handleChange = (event) => {
-    setNum(event.target.value);
-  }
-  // const RentItem = async (item) => {
-  //   console.log("The selected value is ",num);
-  //   const priceofSingle=Number(item.totalPrice)/item.num;
-  //   const priceToPay=priceofSingle*num;
-  //   console.log("sINGLE pRICE ",priceofSingle);
-  //   console.log("Value to be paid ",priceToPay);
-  //   // await (await marketplace.purchaseItem(item.itemId, { value: item.totalPrice })).wait()
-  //   await(await marketplace.rentItem(item.itemId,num, {value: priceToPay+0.1})).wait();
+  const RentItems = async (item, idx) => {
+    const num = selectedNumbers[idx];
+    console.log("The selected value is ", num);
 
-  //   // loadMarketplaceItems();
-  // }
+    if (num <= items.remaining) {
+      console.log("Value of NUM=",num,"Total Rmaining ",item.num);
+      toast.error("Select proper value acc. to Remaining");
+      return
+    }
+
+      // single price
+      const priceOfSingle = ethers.utils.parseUnits((item.totalPrice / item.num).toString(), "wei");
+      const priceToPay = priceOfSingle.mul(num);
+
+      console.log("Single price in Wei: ", priceOfSingle.toString());
+      console.log("Value to be paid in Wei: ", priceToPay.toString());
+
+      const extraEther = ethers.utils.parseUnits("0.5", "ether");
+      const totalValue = priceToPay.add(extraEther); // Total price will be
+
+      console.log("Total value to be paid in Wei: ", totalValue.toString());
+
+      // Sending the transaction
+      const transaction = await marketplace.rentItem(item.itemId, num, { value: totalValue });
+      await transaction.wait();
+
+      toast.success(`Successfully borrowed ${num} NFT(s)`, { position: "top-center" });
+      // Optionally reload marketplace items
+      loadMarketplaceItems();
+
+  };
+
+  useEffect(() => {
+    loadMarketplaceItems();
+  }, []);
+
+  return (
+    <>
+      {toggle ? (
+        <Info Changestate={() => setToggle(false)} nftitem={nftitem} />
+      ) : (
+        <div className="flex justify-center min-h-screen">
+          {items.length > 0 ? (
+            <div className="container mx-auto mt-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {items.map((item, idx) => (
+                  <div key={idx} className="bg-gray-100 rounded-lg shadow-md dark:bg-gray-800 hover:transform hover:scale-105 transition-transform duration-300">
+                    <img
+                      className="rounded-t-lg object-cover w-full h-56"
+                      src={item.image}
+                      alt="flower"
+                    />
+                    <div className="p-2">
+                      <h5 className="text-xl font-semibold text-blue-600 dark:text-blue-400">{item.name}</h5>
+                      <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                        <strong>{ethers.utils.formatUnits(item.totalPrice, "ether")} BIT</strong><br />
+                        <strong>Total Minted: {item.num}</strong><br />
+                        <strong>Remaining: {item.remaining}</strong>
+                      </p>
+                      <select
+                        onChange={(event) => handleChange(idx, event)}
+                        value={selectedNumbers[idx] || ""}
+                        id="underline_select"
+                        className="block py-1 px-0 w-full text-sm text-gray-200 bg-transparent border-0 border-b-2 border-gray-200 appearance-none dark:text-gray-400 dark:border-gray-700 focus:outline-none focus:ring-0 focus:border-gray-200 peer font-bold bg-dark-grey transition-all duration-300 ease-in-out"
+                      >
+                        <option value="" className="bg-dark-grey">Choose number</option>
+                        <option value="1" className="bg-dark-grey text-black">1</option>
+                        <option value="2" className="bg-dark-grey text-black">2</option>
+                        <option value="3" className="bg-dark-grey text-black">3</option>
+                        <option value="4" className="bg-dark-grey text-black">4</option>
+                        <option value="5" className="bg-dark-grey text-black">5</option>
+                        <option value="6" className="bg-dark-grey text-black">6</option>
+                        <option value="7" className="bg-dark-grey text-black">7</option>
+                        <option value="8" className="bg-dark-grey text-black">8</option>
+                      </select>
+                      <button
+                        onClick={() => RentItems(item, idx)}
+                        className="mt-4 w-full px-4 py-2 text-sm font-medium leading-5 text-white transition-transform transform duration-300 bg-gradient-to-r from-blue-500 to-purple-600 border border-transparent rounded-lg shadow-lg hover:scale-105 hover:from-blue-600 hover:to-purple-700 focus:outline-none focus:ring-4 focus:ring-blue-300"
+                      >
+                        Rent
+                        <svg
+                          className="rtl:rotate-180 w-4 h-4 inline-block ml-2 -mt-px"
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 14 10"
+                          fill="none"
+                        >
+                          <path
+                            stroke="currentColor"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M1 5h12m0 0L9 1m4 4L9 9"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <main className="container mx-auto mt-8">
+              <h2 className="text-center text-xl font-semibold text-gray-800 dark:text-white">Loading</h2>
+            </main>
+          )}
+        </div>
+      )}
+    </>
+  );
+};
+
+export default Home;
+
+
+// const RentItem = async (item) => {
+//   console.log("The selected value is ",num);
+//   const priceofSingle=Number(item.totalPrice)/item.num;
+//   const priceToPay=priceofSingle*num;
+//   console.log("sINGLE pRICE ",priceofSingle);
+//   console.log("Value to be paid ",priceToPay);
+//   // await (await marketplace.purchaseItem(item.itemId, { value: item.totalPrice })).wait()
+//   await(await marketplace.rentItem(item.itemId,num, {value: priceToPay+0.1})).wait();
+
+//   // loadMarketplaceItems();
+// }
 
 //   const RentItems = async (item) => {
 //     console.log("The selected value is ", num);
@@ -225,117 +342,3 @@ const Home = ({ marketplace, account }) => {
 
 //     loadMarketplaceItems();
 // }
-
-//****************For sepolia ****************************/
-  const RentItems = async (item) => {
-    console.log("The selected value is ", num);
-
-    // single price
-    const priceOfSingle = ethers.utils.parseUnits((item.totalPrice / item.num).toString(), "wei");
-    const priceToPay = priceOfSingle.mul(num);
-
-    console.log("Single price in Wei: ", priceOfSingle.toString());
-    console.log("Value to be paid in Wei: ", priceToPay.toString());
-
-    const extraEther = ethers.utils.parseUnits("0.1", "ether");
-    const totalValue = priceToPay.add(extraEther); //totl price will be
-
-    console.log("Total value to be paid in Wei: ", totalValue.toString());
-
-    // Sending the transaction
-    const transaction = await marketplace.rentItem(item.itemId, num, { value: totalValue });
-    await transaction.wait();
-
-    toast.success("Successfully borrowed ",num,"NFT", {position:"top-center"});
-    // Optionally reload marketplace items
-    loadMarketplaceItems();
-}
-
-  useEffect(() => {
-    loadMarketplaceItems();
-  }, []);
-
-  const homeClick = () => {
-    console.log("click");
-  };
-
-  return (
-    <>
-      {toggle ? (
-        <Info Changestate={() => setToggle(false)} nftitem={nftitem} />
-      ) : (
-        <div className="flex justify-center min-h-screen">
-          {items.length > 0 ? (
-            <div className="container mx-auto mt-8">
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {items.map((item, idx) => (
-                  <div key={idx} className="bg-gray-100 rounded-lg shadow-md dark:bg-gray-800 hover:transform hover:scale-105 transition-transform duration-300">
-                    <img
-                      className="rounded-t-lg object-cover w-full h-56"
-                      src={item.image}
-                      alt="flower"
-                    />
-                    <div className="p-2">
-                      <h5 className="text-xl font-semibold text-blue-600 dark:text-blue-400">{item.name}</h5>
-                      <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                        <strong>{ethers.utils.formatUnits(item.totalPrice, "ether")} BIT</strong><br></br>
-                        <strong>Total Minted : {item.num}</strong><br />
-                        <strong>Remaining : {item.remaining}</strong>
-                      </p>
-                      <select onChange={handleChange} value={num} id="underline_select" class="block py-1 px-0 w-full text-sm text-gray-200 bg-transparent border-0 border-b-2 border-gray-200 appearance-none dark:text-gray-400 dark:border-gray-700 focus:outline-none focus:ring-0 focus:border-gray-200 peer font-bold bg-dark-grey transition-all duration-300 ease-in-out">
-                        <option selected class="bg-dark-grey">Choose number</option>
-                        <option value="1" class="bg-dark-grey text-black">1</option>
-                        <option value="2" class="bg-dark-grey text-black">2</option>
-                        <option value="3" class="bg-dark-grey text-black">3</option>
-                        <option value="4" class="bg-dark-grey text-black">4</option>
-                        <option value="5" class="bg-dark-grey text-black">5</option>
-                        <option value="6" class="bg-dark-grey text-black">6</option>
-                        <option value="7" class="bg-dark-grey text-black">7</option>
-                        <option value="8" class="bg-dark-grey text-black">8</option>
-                      </select>
-                      <button onClick={() => RentItems(item)} className="mt-4 w-full px-4 py-2 text-sm font-medium leading-5 text-white transition-transform transform duration-300 bg-gradient-to-r from-blue-500 to-purple-600 border border-transparent rounded-lg shadow-lg hover:scale-105 hover:from-blue-600 hover:to-purple-700 focus:outline-none focus:ring-4 focus:ring-blue-300">
-                        Rent
-                        <svg
-                          className="rtl:rotate-180 w-4 h-4 inline-block ml-2 -mt-px"
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 14 10"
-                          fill="none"
-                        >
-                          {/* <button onClick={() => viewMarketItem(item)} className="mt-4 w-full px-4 py-2 text-sm font-medium leading-5 text-white transition-transform transform duration-300 bg-gradient-to-r from-blue-500 to-purple-600 border border-transparent rounded-lg shadow-lg hover:scale-105 hover:from-blue-600 hover:to-purple-700 focus:outline-none focus:ring-4 focus:ring-blue-300">
-                        Open
-                        <svg
-                          className="rtl:rotate-180 w-4 h-4 inline-block ml-2 -mt-px"
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 14 10"
-                          fill="none"
-                        > */}
-                          <path
-                            stroke="currentColor"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M1 5h12m0 0L9 1m4 4L9 9"
-                          />
-                        </svg>
-                      </button>
-
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ) : (
-            <main className="container mx-auto mt-8">
-              <h2 className="text-center text-xl font-semibold text-gray-800 dark:text-white">Loading</h2>
-            </main>
-          )}
-        </div>
-      )}
-    </>
-
-
-
-  );
-};
-
-export default Home;
