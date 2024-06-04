@@ -200,7 +200,8 @@ const Home = ({ marketplace, account }) => {
     if (num <= items.remaining) {
       console.log("Value of NUM=",num,"Total Rmaining ",item.num);
       toast.error("Select proper value acc. to Remaining");
-      return
+      console.log("Exiting function");
+      return false
     }
 
       // single price

@@ -17,7 +17,7 @@ function App() {
   const [marketplace, setMarketplace] = useState({});
   const [nftItem, setNFTItem] = useState({});
 
-  useEffect(() => {
+  // useEffect(() => {
     const loadProvider = async () => {
       try {
         if (window.ethereum) {
@@ -65,10 +65,10 @@ function App() {
       } catch (error) {
         console.error("Error:", error);
       }
+      console.log("App code end");
     };
-    console.log("App code end");
-    loadProvider();
-  }, []);
+    // loadProvider();
+  // }, []);
 
   return (
 
@@ -80,9 +80,13 @@ function App() {
 
           <Nav account={account} />
           {
-            loading ? (<div>Connecting to Metamask</div>) : (
+            loading ? (<>
+              {/* <div className=' text-white'>Connecting to Metamask</div> */}
+              <First loadProvider={loadProvider} loading={loading}/>
+              </>
+              ) : (
               <Routes>
-              <Route path='/' element={<First />}/>
+                <Route path='/' element={<First loadProvider={loadProvider} loading={loading}/>}/>
                 <Route path='/home' element={<Hero marketplace={marketplace} nftItem={nftItem} account={account} />} />
                 <Route path='/create' element={<Create marketplace={marketplace} />} />
                 {/* <Route path='/my-listed-nfts' element={<MyItem marketplace={marketplace} account={account} />} /> */}
