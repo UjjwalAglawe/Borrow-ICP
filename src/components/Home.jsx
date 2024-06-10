@@ -204,6 +204,8 @@ const Home = ({ marketplace, account }) => {
       return false
     }
 
+    
+
       // single price
       const priceOfSingle = ethers.utils.parseUnits((item.totalPrice / item.num).toString(), "wei");
       const priceToPay = priceOfSingle.mul(num);
@@ -216,13 +218,38 @@ const Home = ({ marketplace, account }) => {
 
       console.log("Total value to be paid in Wei: ", totalValue.toString());
 
-      // Sending the transaction
-      const transaction = await marketplace.rentItem(item.itemId, num, { value: totalValue });
-      await transaction.wait();
+      // getting user balance
+      const getBalance = async (address) => {
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const balance = await provider.getBalance(address);
+        // const balanceInEth = ethers.utils.formatEther(balance);
+        if(balance<totalValue){
+          toast.error("Insufficient Balence")
+          console.log(balance)
+          return false
+        }
+        console.log(balance);
+    }
+      // // Sending the transaction
+      // const transaction = await marketplace.rentItem(item.itemId, num, { value: totalValue });
+      // await transaction.wait();
 
-      toast.success(`Successfully borrowed ${num} NFT(s)`, { position: "top-center" });
-      // Optionally reload marketplace items
-      loadMarketplaceItems();
+      // toast.success(`Successfully borrowed ${num} NFT(s)`, { position: "top-center" });
+      // // Optionally reload marketplace items
+      // loadMarketplaceItems();
+
+      try {
+        // Sending the transaction
+        const transaction = await marketplace.rentItem(item.itemId, num, { value: totalValue });
+        await transaction.wait();
+
+        toast.success(`Successfully borrowed ${num} NFT(s)`, { position: "top-center" });
+        // Optionally reload marketplace items
+        loadMarketplaceItems();
+    } catch (error) {
+        console.error("Transaction failed:", error);
+        toast.error("Transaction failed");
+    }
 
   };
 
