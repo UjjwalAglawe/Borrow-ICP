@@ -51,7 +51,8 @@ function App() {
           setLoading(false);
 
           // const marketplaceAddress = "0x88ab1903f29B1A7535de1188F08D7892CEE3911b"; //sepolia
-          const marketplaceAddress = "0x53AfCdA7f3a1183B1CD7bFF6B0585A46514208A7";  //bitfinty ICP
+          // const marketplaceAddress = "0x53AfCdA7f3a1183B1CD7bFF6B0585A46514208A7";  //bitfinty ICP
+          const marketplaceAddress = "0x830A7594eF91d10662F8B623BB65b290a7a08143";  //bitfinty ICP to sender
           const marketplaceContract = new ethers.Contract(
             marketplaceAddress,
             marketplace_abi,
