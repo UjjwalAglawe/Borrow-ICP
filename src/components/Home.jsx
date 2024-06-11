@@ -197,6 +197,11 @@ const Home = ({ marketplace, account }) => {
     const num = selectedNumbers[idx];
     console.log("The selected value is ", num);
 
+    if(account === item.seller)
+      {
+        toast.error("Owner cannot rent")
+        return false
+      }
     if (num <= items.remaining) {
       console.log("Value of NUM=",num,"Total Rmaining ",item.num);
       toast.error("Select proper value acc. to Remaining");
