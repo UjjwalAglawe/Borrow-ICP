@@ -25,19 +25,19 @@ function First({loadProvider,loading}) {
         </h1>
         <Slider {...settings}>
           <div className="text-xl font-thin">
-            <span className='text-sky-400 font-bold'>Welcome to MelodyTon </span>– The premier platform for digital artistry and innovation in the world of Video NFTs. Dive into an immersive experience where creativity meets blockchain technology, enabling artists and collectors alike to create, showcase, and watch unique video masterpieces.
+            <span className='text-sky-400 font-bold'>Welcome to RentEase </span>– the premier platform for creating and renting residential properties. Dive into a seamless experience where property management meets cutting-edge technology, enabling owners and renters alike to create, list, and rent unique homes.
           </div>
           <div className="text-xl font-thin">
-            <span className='text-sky-400 font-bold'>Create:</span> With our intuitive tools, transform your videos into one-of-a-kind NFTs. Whether it’s a captivating animation, a breathtaking short film, or an engaging motion graphic, your content is minted with a unique digital signature, ensuring authenticity and ownership.
+            <span className='text-sky-400 font-bold'>Create:</span> With our intuitive tools, transform your properties into attractive rental listings. Whether it’s a cozy apartment, a spacious flat, or a luxurious house, your property is presented with detailed descriptions, high-quality photos, and virtual tours, ensuring maximum visibility and appeal.
           </div>
           <div className="text-xl font-thin">
-          <span className='text-sky-400 font-bold'>Watch:</span> Explore a diverse gallery of Video NFTs created by talented artists from around the globe. Experience art in motion like never before, with each piece telling its own story and bringing a new perspective to the digital canvas.
+          <span className='text-sky-400 font-bold'>Watch:</span> Explore a diverse portfolio of properties available for rent, curated by owners from around the globe. Whether you’re looking for a short-term rental or a long-term lease, find the perfect home that suits your needs and preferences. Select the number of flats or houses you want to rent, view pricing details, and proceed with a secure payment process.
           </div>
           <div className="text-xl font-thin">
-          <span className='text-sky-400 font-bold'>Connect:</span> Join a community of visionary creators and enthusiastic collectors. Participate in discussions, collaborate on projects, and be at the forefront of the Video NFT movement.
+          <span className='text-sky-400 font-bold'>Connect:</span> oin a community of dedicated property owners and prospective renters. Engage in discussions, read reviews, and connect directly with property owners to ask questions and arrange viewings.
           </div>
           <div className="text-xl font-thin">
-          <span className='text-sky-400 font-bold'>MelodyTon</span> is more than a platform; it’s a revolution in the digital art space. Unleash your creativity, discover extraordinary art, and be part of the future of video expression today.
+          <span className='text-sky-400 font-bold'>RentEase</span>  is more than a platform; it’s a revolution in the property rental space. Simplify your rental process, discover exceptional homes, and be part of the future of residential renting today.
           </div>
         </Slider>
       </div>
