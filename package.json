@@ -50,6 +50,7 @@
     ]
   },
   "devDependencies": {
+    "@types/react-slick": "^0.23.13",
     "tailwindcss": "^3.4.1"
   }
 }
