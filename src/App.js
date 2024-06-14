@@ -80,7 +80,7 @@ function App() {
         <div className="gradient-bg-welcome">
           {/* <button onClick={connect}>Con</button> */}
 
-          <Nav account={account} />
+          <Nav account={account} loadProvider={loadProvider} loading={loading}/>
           {
             loading ? (<>
               {/* <div className=' text-white'>Connecting to Metamask</div> */}
