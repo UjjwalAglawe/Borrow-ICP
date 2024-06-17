@@ -5,7 +5,7 @@ function Nav({ account, loadProvider, loading }) {
 
   return (
     // dark:border-gray-700
-    <nav className="border-gray-200 bg-gray-50 dark:bg-custom-dark-blue  transition ease-in-out hover:bg-gray-100 dark:hover:bg-gray-600 nav-gradient-border">
+    <nav className="border-gray-500 bg-custom-nav dark:bg-custom-nav  transition ease-in-out hover:bg-slate-700 dark:lighterCustomColor nav-gradient-border">
 
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between p-4">
