@@ -197,63 +197,63 @@ const Home = ({ marketplace, account }) => {
     const num = selectedNumbers[idx];
     console.log("The selected value is ", num);
 
-    if(account === item.seller)
-      {
-        toast.error("Owner cannot rent")
-        return false
-      }
+    if (account === item.seller) {
+      toast.error("Owner cannot rent")
+      return false
+    }
     if (num <= items.remaining) {
-      console.log("Value of NUM=",num,"Total Rmaining ",item.num);
+      console.log("Value of NUM=", num, "Total Rmaining ", item.num);
       toast.error("Select proper value acc. to Remaining");
       console.log("Exiting function");
       return false
     }
 
-    
 
-      // single price
-      const priceOfSingle = ethers.utils.parseUnits((item.totalPrice / item.num).toString(), "wei");
-      const priceToPay = priceOfSingle.mul(num);
 
-      console.log("Single price in Wei: ", priceOfSingle.toString());
-      console.log("Value to be paid in Wei: ", priceToPay.toString());
+    // single price
+    const priceOfSingle = ethers.utils.parseUnits((item.totalPrice / item.num).toString(), "wei");
+    const priceToPay = priceOfSingle.mul(num);
 
-      const extraEther = ethers.utils.parseUnits("0.5", "ether");
-      const totalValue = priceToPay.add(extraEther); // Total price will be
+    console.log("Single price in Wei: ", priceOfSingle.toString());
+    console.log("Value to be paid in Wei: ", priceToPay.toString());
 
-      console.log("Total value to be paid in Wei: ", totalValue.toString());
+    const extraEther = ethers.utils.parseUnits("0.5", "ether");
+    const totalValue = priceToPay.add(extraEther); // Total price will be
 
-      // getting user balance
-      const getBalance = async (address) => {
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const balance = await provider.getBalance(address);
-        // const balanceInEth = ethers.utils.formatEther(balance);
-        if(balance<totalValue){
-          toast.error("Insufficient Balence")
-          console.log(balance)
-          return false
-        }
-        console.log(balance);
+    console.log("Total value to be paid in Wei: ", totalValue.toString());
+
+    // getting user balance
+    const getBalance = async (address) => {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const balance = await provider.getBalance(address);
+      // const balanceInEth = ethers.utils.formatEther(balance);
+      if (balance < totalValue) {
+        toast.error("Insufficient Balence")
+        console.log(balance)
+        return false
+      }
+      console.log(balance);
     }
-      // // Sending the transaction
-      // const transaction = await marketplace.rentItem(item.itemId, num, { value: totalValue });
-      // await transaction.wait();
+    getBalance(account);
+    // // Sending the transaction
+    // const transaction = await marketplace.rentItem(item.itemId, num, { value: totalValue });
+    // await transaction.wait();
 
-      // toast.success(`Successfully borrowed ${num} NFT(s)`, { position: "top-center" });
-      // // Optionally reload marketplace items
-      // loadMarketplaceItems();
+    // toast.success(`Successfully borrowed ${num} NFT(s)`, { position: "top-center" });
+    // // Optionally reload marketplace items
+    // loadMarketplaceItems();
 
-      try {
-        // Sending the transaction
-        const transaction = await marketplace.rentItem(item.itemId, num, { value: totalValue });
-        await transaction.wait();
+    try {
+      // Sending the transaction
+      const transaction = await marketplace.rentItem(item.itemId, num, { value: totalValue });
+      await transaction.wait();
 
-        toast.success(`Successfully borrowed ${num} NFT(s)`, { position: "top-center" });
-        // Optionally reload marketplace items
-        loadMarketplaceItems();
+      toast.success(`Successfully borrowed ${num} NFT(s)`, { position: "top-center" });
+      // Optionally reload marketplace items
+      loadMarketplaceItems();
     } catch (error) {
-        console.error("Transaction failed:", error);
-        toast.error("Transaction failed");
+      console.error("Transaction failed:", error);
+      toast.error("Transaction failed");
     }
 
   };
