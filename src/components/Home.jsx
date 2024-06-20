@@ -225,14 +225,18 @@ const Home = ({ marketplace, account }) => {
     // getting user balance
     const getBalance = async (address) => {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const balance = await provider.getBalance(address);
+      const balances = await provider.getBalance(address);
       // const balanceInEth = ethers.utils.formatEther(balance);
-      if (balance < totalValue) {
+      if (parseFloat(totalValue) > parseFloat(balances)) {
         toast.error("Insufficient Balence")
-        console.log(balance)
+        console.log("This is totalvalue", parseFloat(totalValue))
+        console.log("This is balaence", parseFloat(totalValue))
         return false
       }
-      console.log(balance);
+      else {
+        console.log('Proper', balances.toString());
+
+      }
     }
     getBalance(account);
     // // Sending the transaction
