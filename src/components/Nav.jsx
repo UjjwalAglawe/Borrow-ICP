@@ -10,7 +10,7 @@ function Nav({ account, loadProvider, loading }) {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between p-4">
           <div className="flex cursor-pointer items-center space-x-3 rtl:space-x-reverse">
-            <Link to='/' className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white no-underline">Ignitus Networks</Link>
+            <Link to='/' className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white no-underline">AssetTokens</Link>
           </div>
 
           <div className="flex justify-around w-full max-w-md">
