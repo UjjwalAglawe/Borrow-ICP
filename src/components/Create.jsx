@@ -210,7 +210,7 @@ const Create = ({ marketplace }) => {
             size="lg"
             required
             type="number"
-            placeholder="Price in BIT"
+            placeholder="Price in CELO"
             className="text-lg max-w-[200px] w-full"
           />
           <Form.Control

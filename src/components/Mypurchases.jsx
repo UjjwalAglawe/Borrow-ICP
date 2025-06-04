@@ -20,16 +20,16 @@ export default function MyPurchases({ marketplace, nft, account }) {
 
       
       const purchases = await Promise.all(results.map(async i => {
-        // fetch arguments from each result
+        
         i = i.args
-        // get uri url from nft contract
+        
         const uri = await marketplace.tokenURI(i.tokenId)
-        // use uri to fetch the nft metadata stored on ipfs 
+        
       
         const response = await fetch(uri)
         
         const metadata = await response.json()
-        // get total price of item (item price + fee)
+        
         console.log(metadata);
         const totalPrice = await marketplace.getTotalPrice(i.itemId)
         // define listed item object
